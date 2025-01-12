@@ -1,2 +1,9 @@
 # Cybersecurity-with-python-
-Try to collect all Automation python script for using Cyber security. 
+A comprehensive collection of automation scripts designed for cybersecurity enthusiasts,
+built using python. This project aims to collect all possible automation script for and automate repetitive processes in the field of cybersecurity.
+
+# Contributions
+Contributions are welcome! Feel free to fork the repository, submit pull requests, or suggest new ideas.
+
+# Disclaimer
+This project is for educational and ethical testing purposes only. Unauthorized use of these tools is strictly prohibited.
