@@ -1,0 +1,27 @@
+//This script connects to a specified hostname and port using SSL/TLS and
+prints out the SSL/TLS version and cipher being used. This information can
+be used to identify potentially weak or outdated configurations.
+
+import ssl
+
+import socket
+
+def check_ssl_version(hostname, port):
+
+    context = ssl.create_default_context()
+
+    with socket.create_connection((hostname, port)) as sock:
+
+        with context.wrap_socket(sock,
+
+server_hostname=hostname) as secure_sock:
+
+            print(f"SSL/TLS version:
+
+{secure_sock.version()}")
+
+            print(f"Cipher: {secure_sock.cipher()}")
+
+if __name__ == "__main__":
+
+    check_ssl_version("example.com", 443)
