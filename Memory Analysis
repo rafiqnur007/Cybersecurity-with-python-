@@ -1,0 +1,27 @@
+//Analyze the memory dump using tools like Volatility
+
+
+from volatility.framework import contexts, plugins
+def analyze_memory_dump(dump_path):
+
+    context = contexts.Context()
+
+    context.add_requirement("automagic.LayerStacker")
+
+    context.add_requirement("automagic.Linux")
+
+    
+
+    plugin = plugins.linux.pslist.PsList(context, dump_path)
+
+    tree = plugin.run()
+
+    
+
+    for task in tree:
+
+        print(f"PID: {task.pid}, Name:
+
+{task.comm.cast('string')}")
+
+analyze_memory_dump("/path/to/memory_dump")
