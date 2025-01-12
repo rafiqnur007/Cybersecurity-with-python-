@@ -1,0 +1,47 @@
+//This script reads a Wazuh log file (alerts.json), filters high-severity alerts (level ≥ 5), and saves them into a CSV file for further analysis.
+
+
+import json
+import csv
+
+# Wazuh log file path
+log_file = "/var/ossec/logs/alerts.json"
+output_file = "wazuh_high_severity_alerts.csv"
+
+def analyze_wazuh_logs(file_path, output_file):
+    high_severity_logs = []  # List to store filtered logs
+    
+    try:
+        with open(file_path, 'r') as file:
+            for line in file:
+                try:
+                    log_entry = json.loads(line)  # Parse each line as JSON
+                    severity = log_entry.get('rule', {}).get('level', 0)
+                    
+                    if severity >= 5:  # Filter logs with severity >= 5
+                        high_severity_logs.append({
+                            'timestamp': log_entry.get('timestamp', 'N/A'),
+                            'level': severity,
+                            'description': log_entry.get('full_log', 'N/A')
+                        })
+                except json.JSONDecodeError:
+                    print("Skipping a line due to JSON decoding error.")
+        
+        # Save filtered logs to a CSV file
+        save_to_csv(high_severity_logs, output_file)
+        print(f"High severity alerts saved to {output_file}.")
+    
+    except FileNotFoundError:
+        print("Log file not found. Check the file path.")
+
+def save_to_csv(logs, output_file):
+    with open(output_file, 'w', newline='') as csvfile:
+        fieldnames = ['timestamp', 'level', 'description']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        
+        writer.writeheader()  # Write column headers
+        for log in logs:
+            writer.writerow(log)  # Write each log entry
+
+# Run the analysis
+analyze_wazuh_logs(log_file, output_file)
