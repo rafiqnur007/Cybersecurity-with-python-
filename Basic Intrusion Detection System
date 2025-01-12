@@ -1,0 +1,83 @@
+//simple IDS that monitors incoming TCP traffic and
+detects potential port scanning attempts
+
+
+from scapy.all import *
+
+import threading
+
+import re
+
+import logging
+
+# Configure logging
+
+logging.basicConfig(filename='ids.log', level=logging.INFO,
+format='%(asctime)s - %(message)s')
+
+# Define suspicious patterns
+
+SUSPICIOUS_PATTERNS = [
+
+    r'(?i)admin',
+
+    r'(?i)password',
+
+    r'(?i)select.*from',
+
+    r'(?i)union.*select',
+
+]
+
+# Track connection attempts
+
+connection_tracker = {}
+
+def analyze_packet(packet):
+
+    if packet.haslayer(TCP):
+
+        src_ip = packet[IP].src
+
+        dst_port = packet[TCP].dport
+
+        # Check for potential port scanning
+
+        if src_ip not in connection_tracker:
+
+            connection_tracker[src_ip] = set()
+
+        connection_tracker[src_ip].add(dst_port)
+
+        if len(connection_tracker[src_ip]) > 10:
+
+            logging.warning(f"Potential port scan detected
+
+from {src_ip}")
+
+        # Check payload for suspicious patterns
+
+        if packet.haslayer(Raw):
+
+            payload = str(packet[Raw].load)
+for pattern in SUSPICIOUS_PATTERNS:
+
+                if re.search(pattern, payload):
+
+                    logging.warning(f"Suspicious pattern
+
+detected from {src_ip}: {pattern}")
+
+def start_sniffing():
+
+    sniff(filter="tcp", prn=analyze_packet)
+
+if __name__ == "__main__":
+
+    print("Starting IDS...")
+
+    sniff_thread = threading.Thread(target=start_sniffing)
+
+    sniff_thread.start()
+
+    sniff_thread.join()
