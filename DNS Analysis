@@ -1,0 +1,13 @@
+//Monitor DNS queries made by the malware
+
+
+import dns.resolver
+def analyze_dns(domain):
+    try:
+        answers = dns.resolver.resolve(domain, 'A')
+        for rdata in answers:
+            print(f"Domain {domain} resolves to IP:
+{rdata.address}")
+    except dns.resolver.NXDOMAIN:
+        print(f"Domain {domain} does not exist")
+analyze_dns("suspicious-domain.com")
