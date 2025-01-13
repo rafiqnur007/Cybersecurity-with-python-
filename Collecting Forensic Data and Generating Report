@@ -1,0 +1,167 @@
+collect system information and generate a forensic report
+This script collects various system information, including
+Basic system details (hostname, IP address, OS, hardware),Running processes, Network connections, Installed software
+
+
+import os
+
+import platform
+
+import psutil
+
+import socket
+
+import subprocess
+
+import datetime
+
+def get_system_info():
+
+    info = {}
+
+    info['hostname'] = socket.gethostname()
+
+    info['ip_address'] =
+
+socket.gethostbyname(socket.gethostname())
+
+    info['os'] = platform.system()
+
+    info['os_version'] = platform.version()
+
+    info['cpu'] = platform.processor()
+
+    info['ram'] = psutil.virtual_memory().total // (1024 **
+
+3)  # GB
+info['disk'] = psutil.disk_usage('/').total // (1024 **
+
+3)  # GB
+
+    return info
+
+def get_running_processes():
+
+    processes = []
+
+    for proc in psutil.process_iter(['pid', 'name',
+
+'username']):
+
+        processes.append(proc.info)
+
+    return processes
+
+def get_network_connections():
+
+    connections = []
+
+    for conn in psutil.net_connections():
+
+        connections.append({
+
+            'local_address': conn.laddr.ip,
+
+            'local_port': conn.laddr.port,
+
+            'remote_address': conn.raddr.ip if conn.raddr
+
+else None,
+
+            'remote_port': conn.raddr.port if conn.raddr
+
+else None,
+
+            'status': conn.status
+
+        })
+
+    return connections
+
+def get_installed_software():
+
+    if platform.system() == 'Windows':
+
+        output = subprocess.check_output('wmic product get
+
+name,version', shell=True).decode()
+
+        return [line.split('  ') for line in
+output.strip().split('\n')[1:]]
+
+    elif platform.system() == 'Linux':
+
+        output = subprocess.check_output('dpkg -l | tail -n
+
++6 | awk \'{print $2,$3}\'', shell=True).decode()
+
+        return [line.split() for line in
+
+output.strip().split('\n')]
+
+    else:
+
+        return []
+
+def generate_forensic_report():
+
+    report = "Forensic Report\n\n"
+
+    report += f"Date and Time:
+
+{datetime.datetime.now()}\n\n"
+
+    report += "System Information:\n"
+
+    system_info = get_system_info()
+
+    for key, value in system_info.items():
+
+        report += f"{key}: {value}\n"
+
+    report += "\n"
+
+    report += "Running Processes:\n"
+
+    processes = get_running_processes()
+
+    for proc in processes:
+
+        report += f"PID: {proc['pid']}, Name:
+
+{proc['name']}, User: {proc['username']}\n"
+
+    report += "\n"
+
+    report += "Network Connections:\n"
+
+    connections = get_network_connections()
+
+    for conn in connections:
+report += f"Local: {conn['local_address']}:
+
+{conn['local_port']}, "
+
+        report += f"Remote: {conn['remote_address']}:
+
+{conn['remote_port']}, "
+
+        report += f"Status: {conn['status']}\n"
+
+    report += "\n"
+
+    report += "Installed Software:\n"
+
+    software = get_installed_software()
+
+    for item in software:
+
+        report += f"Name: {item[0]}, Version: {item[1]}\n"
+
+    with open('forensic_report.txt', 'w') as f:
+
+        f.write(report)
+
+    print("Forensic report generated: forensic_report.txt")
+
+generate_forensic_report()
