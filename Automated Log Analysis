@@ -1,0 +1,84 @@
+//Create a script to analyze log files and detect potential security incidents
+
+
+import re
+
+import datetime
+
+def analyze_log_file(log_file):
+suspicious_patterns = [
+
+        r'(?i)failed login',
+
+        r'(?i)access denied',
+
+        r'(?i)unauthorized access',
+
+        r'(?i)sql injection',
+
+        r'(?i)xss attack'
+
+    ]
+
+    incidents = []
+
+    with open(log_file, 'r') as f:
+
+        for line in f:
+
+            for pattern in suspicious_patterns:
+
+                if re.search(pattern, line):
+
+                    timestamp = re.search(r'\d{4}-\d{2}-
+
+\d{2} \d{2}:\d{2}:\d{2}', line)
+
+                    if timestamp:
+
+                        timestamp =
+
+datetime.datetime.strptime(timestamp.group(), '%Y-%m-%d
+
+%H:%M:%S')
+
+                    else:
+
+                        timestamp = datetime.datetime.now()
+
+                    incidents.append({
+
+                        'timestamp': timestamp,
+
+                        'pattern': pattern,
+
+                        'log_entry': line.strip()
+
+                    })
+
+    return incidents
+def generate_incident_report(incidents):
+
+    report = "Incident Report\n\n"
+
+    for incident in incidents:
+
+        report += f"Timestamp: {incident['timestamp']}\n"
+
+        report += f"Pattern Detected:
+
+{incident['pattern']}\n"
+
+        report += f"Log Entry: {incident['log_entry']}\n\n"
+
+    with open('incident_report.txt', 'w') as f:
+
+        f.write(report)
+
+log_file = 'server.log'
+
+incidents = analyze_log_file(log_file)
+
+generate_incident_report(incidents)
+
+
