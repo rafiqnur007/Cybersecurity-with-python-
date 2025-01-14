@@ -1,0 +1,86 @@
+//This script analyzes email headers for common phishing indicators, such as
+mismatched 'From' and 'Reply-To' addresses, suspicious 'Received' headers,
+and urgency in the subject line.
+
+
+import email
+
+import re
+
+def analyze_email_headers(email_file):
+
+    with open(email_file, 'r') as f:
+
+        msg = email.message_from_file(f)
+
+    headers = msg._headers
+
+    suspicious_indicators = []
+
+    # Check for mismatched 'From' and 'Reply-To' addresses
+
+    from_address = msg.get('From')
+
+    reply_to_address = msg.get('Reply-To')
+
+    if reply_to_address and from_address !=
+
+reply_to_address:
+suspicious_indicators.append("Mismatched 'From' and
+
+'Reply-To' addresses")
+
+    # Check for suspicious 'Received' headers
+
+    received_headers = msg.get_all('Received')
+
+    if received_headers:
+
+        for header in received_headers:
+
+            if re.search(r'\b(unknown|unverified)\b',
+
+header, re.I):
+
+                suspicious_indicators.append("Suspicious
+
+'Received' header")
+
+                break
+
+    # Check for urgency in the subject
+
+    subject = msg.get('Subject', '')
+
+    urgency_keywords = ['urgent', 'immediate', 'action
+
+required']
+
+    if any(keyword in subject.lower() for keyword in
+
+urgency_keywords):
+
+        suspicious_indicators.append("Urgency indicated in
+
+the subject")
+
+    return suspicious_indicators
+
+# Example usage
+
+email_file = 'suspicious_email.eml'
+
+results = analyze_email_headers(email_file)
+
+if results:
+
+    print("Suspicious indicators found:")
+for indicator in results:
+
+        print(f"- {indicator}")
+
+else:
+
+    print("No suspicious indicators found in the email
+
+headers.")
