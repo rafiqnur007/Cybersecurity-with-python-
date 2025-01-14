@@ -1,0 +1,33 @@
+//Scapy is a powerful interactive packet manipulation program and library. 
+It can forge or decode packets of a wide number of protocols, send them on the wire, capture them, match requests and replies, and much more.
+
+
+from scapy.all import *
+
+# Perform a simple TCP SYN scan
+
+def syn_scan(target, port):
+
+    ans, unans = sr(IP(dst=target)/TCP(dport=port,
+
+flags="S"), timeout=2, verbose=0)
+
+    for s, r in ans:
+
+        if r[TCP].flags == "SA":
+
+            return True
+
+    return False
+
+target = "192.168.1.1"
+
+port = 80
+
+if syn_scan(target, port):
+
+    print(f"Port {port} is open on {target}")
+
+else:
+
+    print(f"Port {port} is closed on {target}")
